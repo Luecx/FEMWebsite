@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <base href=".">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">-->
+    <link href="assets/fontawesome6/css/all.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div style="width:100%; height:100%">
+    <div style="width: 70%; height:100%; float:left">
+        <div style="height:70px">
+            <button id="toolbar-btn-grid" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the background grid">
+                <i class="fa-solid fa-border-all fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-nodes" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the display for the nodes">
+                <i class="fa-solid fa-circle-nodes fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-outline" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the display of the outline of elements">
+                <i class="fa-solid fa-vector-square fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-loads" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the display of applied loads">
+                <i class="fa-solid fa-weight-hanging fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-supports" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the display of restrained nodes">
+                <i class="fa-solid fa-screwdriver fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-show-colors" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+                    title="Enables/Disables the display of colors inside the elements">
+                <i class="fa-solid fa-eye-slash fa-2x"></i>
+            </button>
+        </div>
+        <div style="position: relative; left:0; top:0" id="graphic-div">
+            <canvas style="position:absolute; left:0; top:0;" id="graphic-canvas">
+            </canvas>
+            <canvas style="position:absolute; left:0; top:0; pointer-events: none;" id="text-canvas">
+            </canvas>
+        </div>
+        <div style="height:40px">
+            <div class="input-group m-auto mt-1">
+                <label class="input-group-text" for="toolbar-select-loadcase">LoadCase</label>
+                <select class="form-select" id="toolbar-select-loadcase">
+                </select>
+                <label class="input-group-text" for="toolbar-select-mode">Source</label>
+                <select class="form-select" id="toolbar-select-mode">
+                </select>
+                <label class="input-group-text" for="toolbar-select-mode-idx">ID</label>
+                <select class="form-select" id="toolbar-select-mode-idx">
+                </select>
+                <label class="input-group-text" for="toolbar-select-mode-values">Value</label>
+                <select class="form-select" id="toolbar-select-mode-values">
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group container vertical-scrollable"
+         style="width: 30%; float:left; padding-left: 1rem; overflow-x:hidden; overflow-y:auto;">
+
+        <h2>Menu</h2>
+        <div class="accordion accordion-flush" id="menu-flush">
+        <!--            Mesh Menu-->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-mesh-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-mesh" aria-expanded="false" aria-controls="menu-mesh">
+                        Mesh
+                    </button>
+                </h2>
+                <div id="menu-mesh" class="accordion-collapse collapse" aria-labelledby="menu-mesh-heading">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <!--                            Preset Selector-->
+                            <div class="input-group mb-4">
+                                <label class="input-group-text" for="mesh-select-preset">Preset</label>
+                                <select class="form-select" id="mesh-select-preset" autocomplete="off">
+                                    <option selected></option>
+                                    <option>Rectangle</option>
+                                    <option>Arc</option>
+                                </select>
+                                <label class="input-group-text" for="mesh-order-select">Order</label>
+                                <select class="form-select" id="mesh-order-select">
+                                    <option selected>1st</option>
+                                    <option selected>2nd</option>
+                                </select>
+                                <button class="btn btn-outline-secondary" id="mesh-generate-button">
+                                    Generate Mesh
+                                </button>
+                            </div>
+                            <!--                            Presets-->
+                            <div id="mesh-rectangle-settings" class="mesh-preset-option d-none">
+
+                                <div class="row justify-content-center">
+                                    <div class="col-12 col-md-8 col-lg-6">
+                                        <img style="width: 80%; height: 100%" src="images/rectangle.svg">
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-width">Width [mm]</label>
+                                        <input type="number" class="form-control" id="mesh-rectangle-width"
+                                               value="100" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-height">Height [mm]</label>
+                                        <input type="number" class="form-control" id="mesh-rectangle-height"
+                                               value="100" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-elements-x">Elements in X</label>
+                                        <input type="number" class="form-control" id="mesh-rectangle-elements-x"
+                                               value="50" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-elements-y">Elements in Y</label>
+                                        <input type="number" class="form-control" id="mesh-rectangle-elements-y"
+                                               value="50" required>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div id="mesh-arc-settings" class="mesh-preset-option d-none">
+                                <div class="row justify-content-center">
+                                    <div class="col-12 col-md-8 col-lg-6">
+                                        <img style="width: 100%; height: 100%" src="images/arc.svg">
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-width">Width (W) [mm]</label>
+                                        <input type="number" class="form-control" id="mesh-arc-width" value="60"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-height">Length (L) [mm]</label>
+                                        <input type="number" class="form-control" id="mesh-arc-length" value="30"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-height">Outer Radius (R) [mm]</label>
+                                        <input type="number" class="form-control" id="mesh-arc-radius" value="150"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-height">Arc Angle (alpha) [°]</label>
+                                        <input type="number" class="form-control" id="mesh-arc-angle" value="90"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-elements-x">Elements along outer edge</label>
+                                        <input type="number" class="form-control" id="mesh-arc-elements-arc"
+                                               value="50" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="mb-1" for="mesh-rectangle-elements-y">Elements along width</label>
+                                        <input type="number" class="form-control" id="mesh-arc-elements-width"
+                                               value="10" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--            Material Menu-->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-material-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-material" aria-expanded="false" aria-controls="menu-material">
+                        Material
+                    </button>
+                </h2>
+                <div id="menu-material" class="accordion-collapse collapse" aria-labelledby="menu-material-heading">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <!--                            Preset Selector-->
+                            <div class="input-group mb-4">
+                                <label class="input-group-text" for="material-select-preset">Preset</label>
+                                <select class="form-select" id="material-select-preset">
+                                    <option selected></option>
+                                </select>
+                                <button class="btn btn-outline-secondary" id="material-apply">
+                                    Apply Material
+                                </button>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="mb-1" for="material-young">Youngs Module [Mpa]</label>
+                                    <input type="number" class="form-control" id="material-young"
+                                           value="" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="mb-1" for="material-poisson">Poisson's Ratio [-]</label>
+                                    <input type="number" class="form-control" id="material-poisson"
+                                           value="" required>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--            Load Case Menu-->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-loadcase-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-loadcase" aria-expanded="false" aria-controls="menu-loadcase">
+                        LoadCase
+                    </button>
+                </h2>
+                <div id="menu-loadcase" class="accordion-collapse collapse" aria-labelledby="menu-loadcase-heading">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <div class="input-group mb-4">
+                                <select class="form-select" id="select-loadcase"></select>
+                                <button class="btn btn-outline-secondary" id="btn-add-loadcase">
+                                    <i class="fa-solid fa-plus fa"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" id="btn-remove-loadcase">
+                                    <i class="fa-solid fa-minus fa"></i>
+                                </button>
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-boundary-conditions-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-boundary-conditions" aria-expanded="false" aria-controls="menu-boundary-conditions">
+                        Boundary Conditions
+                    </button>
+                </h2>
+                <div id="menu-boundary-conditions" class="accordion-collapse collapse" aria-labelledby="menu-boundary-conditions-heading">
+                    <div class="accordion-body">
+                        <label class="mb-1" for="loadcase-support-group">Apply Displacement</label>
+                        <div class="input-group mb-4" id="loadcase-support-group">
+                            <label class="input-group-text" for="loadcase-support-x-group">X</label>
+                            <div class="input-group-text" id="loadcase-support-x-group">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="loadcase-support-x-enabled">
+                            </div>
+                            <input type="number" class="form-control" value="0" id="loadcase-support-x-value">
+                            <label class="input-group-text" for="loadcase-support-y-group">Y</label>
+                            <div class="input-group-text" id="loadcase-support-y-group">
+                                <input class="form-check-input mt-0" type="checkbox" value="" id="loadcase-support-y-enabled">
+                            </div>
+                            <input type="number" class="form-control" value="0" id="loadcase-support-y-value">
+                            <button class="btn btn-outline-secondary" id="loadcase-support-select-nodes">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" id="loadcase-support-generate" disabled>
+                                Apply
+                            </button>
+                        </div>
+
+                        <label class="mb-1" for="loadcase-force-group">Generate Force</label>
+                        <div class="input-group mb-4" id="loadcase-force-group">
+                            <label class="input-group-text" for="loadcase-force-x-value">X</label>
+                            <input type="number" class="form-control" value="0" id="loadcase-force-x-value">
+                            <label class="input-group-text" for="loadcase-force-y-value">Y</label>
+                            <input type="number" class="form-control" value="0" id="loadcase-force-y-value">
+                            <button class="btn btn-outline-secondary" id="loadcase-force-select-nodes">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" id="loadcase-force-generate" disabled>
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-static-analysis-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-static-analysis" aria-expanded="false" aria-controls="menu-static-analysis">
+                        Static Analysis
+                    </button>
+                </h2>
+                <div id="menu-static-analysis" class="accordion-collapse collapse" aria-labelledby="menu-static-analysis-heading">
+                    <div class="accordion-body">
+                        <div class="row g-3 text-center">
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Valid Mesh</b></label>
+                                <i id="static-analysis-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Material applied</b></label>
+                                <i id="static-analysis-material-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Supports set</b></label>
+                                <i id="static-analysis-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Forces applied</b></label>
+                                <i id="static-analysis-forces-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="progress mt-4">
+                                <div id="static-analysis-progress-1"
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                     role="progressbar" style="width: 0"></div>
+                                <div id="static-analysis-progress-2"
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                                     role="progressbar" style="width: 0"></div>
+                                <div id="static-analysis-progress-3"
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                                     role="progressbar" style="width: 0"></div>
+                                <div id="static-analysis-progress-4"
+                                     class="progress-bar progress-bar-striped progress-bar-animated"
+                                     role="progressbar" style="width: 0"></div>
+                            </div>
+                            <button class="btn btn-primary mt-3" id="static-analysis-run-button">Start</button>
+                            <label class="float-end me-1 mt-1" id="static-analysis-progress-info"></label>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="solver/FFES_0.1.js"></script>
+
+<script src="js/misc/ready.js"></script>
+
+<script src="js/misc/togglebutton.js"></script>
+<script src="js/misc/toggleicon.js"></script>
+
+<script src="js/model/model_data.js"></script>
+<script src="js/model/model.js"></script>
+
+<script src="js/misc/loadcasemenu.js"></script>
+<script src="js/misc/loadcasebcsettings.js"></script>
+<script src="js/misc/meshmenu.js"></script>
+<script src="js/misc/materialmenu.js"></script>
+<script src="js/misc/staticanalysis.js"></script>
+
+<script src="js/misc/toolbar.js"></script>
+<script src="js/misc/botbar.js"></script>
+
+<script src="js/input/Camera.js"></script>
+<script src="js/shader/shader.js"></script>
+<script src="js/shader/scaleshader.js"></script>
+<script src="js/shader/meshshader.js"></script>
+<script src="js/shader/gridshader.js"></script>
+<script src="js/shader/pointshader.js"></script>
+<script src="js/shader/lineshader.js"></script>
+<script src="js/shader/arrowshader.js"></script>
+<script src="js/input/Control.js"></script>
+<script src="js/model/generate_mesh.js"></script>
+<script src="js/model/buffer.js"></script>
+<script src="js/model/element.js"></script>
+<script src="js/scene/Scene.js"></script>
+<script src="js/debug/webgl-debug.js"></script>
+<script src="js/graphics.js"></script>
+</body>
+</html>

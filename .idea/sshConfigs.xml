@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="ssh.strato.de" id="045fd166-39ea-4b13-baae-7aa501c155c8" port="22" customName="finneggers.de" nameFormat="CUSTOM" username="finneggers.de" useOpenSSHConfig="true">
+        <option name="customName" value="finneggers.de" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

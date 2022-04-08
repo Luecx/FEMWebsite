@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="38a6a3f7-dbb2-43ff-81a6-ece1a277a5d6" name="finneggers.de">
+        <fileTransfer rootFolder="/finneggers.de/fem" accessType="SFTP" host="ssh.strato.de" port="22" sshConfigId="045fd166-39ea-4b13-baae-7aa501c155c8" sshConfig="finneggers.de">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
