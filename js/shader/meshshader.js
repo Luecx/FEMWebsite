@@ -28,12 +28,12 @@ class MeshShader extends Shader{
            
             vec3 getColorbarEntry(float v){
              
-                vec3 c1 = vec3(0.5, 0.0, 0.5);
-                vec3 c2 = vec3(0.0, 0.0, 1.0);
-                vec3 c3 = vec3(0.2, 1.0, 1.0);
-                vec3 c4 = vec3(0.0, 1.0, 0.0);
-                vec3 c5 = vec3(1.0, 1.0, 0.0);
-                vec3 c6 = vec3(1.0, 0.0, 0.0);
+                vec3 c1 = vec3(0.00, 0.00, 0.51);  // 0
+                vec3 c2 = vec3(0.00, 0.00, 1.00);  // 0.2
+                vec3 c3 = vec3(0.00, 1.00, 1.00);  // 0.4
+                vec3 c4 = vec3(1.00, 1.00, 0.00);  // 0.6
+                vec3 c5 = vec3(1.00, 0.00, 0.00);  // 0.85
+                vec3 c6 = vec3(0.51, 0.00, 0.00);  // 1.0
                 
                 if(v < 0.2){
                     return interpolateColors(0.0,0.2,c1,c2,v);
@@ -41,10 +41,10 @@ class MeshShader extends Shader{
                     return interpolateColors(0.2,0.4,c2,c3,v);
                 }else if(v < 0.6){
                     return interpolateColors(0.4,0.6,c3,c4,v);
-                }else if(v < 0.8){
-                    return interpolateColors(0.6,0.8,c4,c5,v);
+                }else if(v < 0.85){
+                    return interpolateColors(0.6,0.85,c4,c5,v);
                 }else {
-                    return interpolateColors(0.8,1.0,c5,c6,v);
+                    return interpolateColors(0.85,1.0,c5,c6,v);
                 }
                 
                 return vec3(0,0,0);

@@ -344,6 +344,48 @@
                     </div>
                 </div>
             </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="menu-topology-optimization-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu-topology-optimization" aria-expanded="false" aria-controls="menu-topology-optimization">
+                        Topology optimization
+                    </button>
+                </h2>
+                <div id="menu-topology-optimization" class="accordion-collapse collapse" aria-labelledby="menu-topology-optimization-heading">
+                    <div class="accordion-body">
+                        <div class="row g-3 text-center">
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Valid Mesh</b></label>
+                                <i id="topology-optimization-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Material applied</b></label>
+                                <i id="topology-optimization-material-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Supports set</b></label>
+                                <i id="topology-optimization-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100 mb-1"><b>Forces applied</b></label>
+                                <i id="topology-optimization-forces-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="progress mt-4">
+                                <div id="topology-optimization-progress-bar"
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                     role="progressbar" style="width: 0"></div>
+                            </div>
+                            <button class="btn btn-primary mt-3" id="topology-optimization-run-button">Start</button>
+                            <label class="float-end me-1 mt-1" id="topology-optimization-progress-info"></label>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -365,6 +407,7 @@
 <script src="js/misc/meshmenu.js"></script>
 <script src="js/misc/materialmenu.js"></script>
 <script src="js/misc/staticanalysis.js"></script>
+<script src="js/misc/topologyopt.js"></script>
 
 <script src="js/misc/toolbar.js"></script>
 <script src="js/misc/botbar.js"></script>

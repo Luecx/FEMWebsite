@@ -45,7 +45,6 @@ function toolbar_init() {
     // removedsourceid       - return  [loadcasesourceid]
     // clearedsourceids      - return  [loadcase_result]
     render_scene.model.model_data.addEventListeners(['addedsourceid'], function (sourceid){
-        console.log("calling add source id");
         // this is only relevant if the selected source and load case match the parents
         if(sourceid.loadcase_result.name          !== toolbar_select_source  .value) return;
         if(sourceid.loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -54,7 +53,6 @@ function toolbar_init() {
         toolbar_select_id.add(new Option(sourceid.id));
     });
     render_scene.model.model_data.addEventListeners(['removedsourceid'], function (sourceid){
-        console.log("calling remove source id");
         // this is only relevant if the selected source and load case match the parents
         if(sourceid.loadcase_result.name          !== toolbar_select_source  .value) return;
         if(sourceid.loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -73,7 +71,6 @@ function toolbar_init() {
 
     });
     render_scene.model.model_data.addEventListeners(['clearedsourceids'], function (loadcase_result){
-        console.log("calling clear source ids");
         // this is only relevant if the selected source and load case match the parents
         if(loadcase_result.name          !== toolbar_select_source  .value) return;
         if(loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -111,23 +108,57 @@ function toolbar_init() {
     });
 }
 
-toolbar_select_values.onchange = function (ev){
+function update_id_selections(){
+    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    // clear all
+    while(toolbar_select_id.options.length > 0){
+        toolbar_select_id[0].remove();
+    }
+    if(loadcase !== null){
+        let source = loadcase.getLoadCaseResult(toolbar_select_source.value);
+        source.ids.forEach(id_entry => {
+            toolbar_select_id.options.add(new Option(id_entry.id));
+        })
+    }
+    update_value_selections();
+}
 
-    console.log(render_scene.model.model_data.toString());
+function update_value_selections(){
+    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    // clear all
+    while(toolbar_select_values.options.length > 0){
+        toolbar_select_values[0].remove();
+    }
+    if(loadcase !== null){
+        let source = loadcase.getLoadCaseResult(toolbar_select_source.value);
+        let id     = source.getLoadCaseSourceID(parseInt(toolbar_select_id.value));
+        if(id !== null){
+            id.fields.forEach(entry => {
+                toolbar_select_values.options.add(new Option(entry.name));
+            });
+        }
+    }
+    update_displayed_entries();
+}
+
+function update_displayed_entries(){
 
     let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
     if(loadcase === null){
         render_scene.model.setNodeValues(null);
+        return;
     }
 
     let loadcase_source = loadcase.getLoadCaseResult(toolbar_select_source.value);
     if(loadcase_source === null){
         render_scene.model.setNodeValues(null);
+        return;
     }
 
     let loadcase_source_id = loadcase_source.getLoadCaseSourceID(parseInt(toolbar_select_id.value));
     if(loadcase_source_id === null){
         render_scene.model.setNodeValues(null);
+        return;
     }
 
     let result = loadcase_source_id.getField(toolbar_select_values.value);
@@ -136,4 +167,35 @@ toolbar_select_values.onchange = function (ev){
     }else{
         render_scene.model.setNodeValues(result.values);
     }
+}
+
+function toolbar_select_highest_topo_id(){
+    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    if(loadcase !== null && toolbar_select_source.value == LCResults.TOPOLOGY_OPTIMIZATION){
+        let source = loadcase.getLoadCaseResult(toolbar_select_source.value);
+        if(source.ids.length > 0){
+            toolbar_select_id.value = source.ids[source.ids.length-1].id+"";
+            update_value_selections();
+        }
+
+    }
+}
+
+function toolbar_select_topology_optimization(){
+    update
+}
+
+toolbar_select_values.onchange = function (ev){
+    update_displayed_entries();
+}
+
+toolbar_select_id.onchange = function (ev){
+    update_value_selections();
+}
+
+toolbar_select_source.onchange = function (ev){
+    update_id_selections();
+}
+toolbar_select_loadcase.onchange = function (ev){
+    update_id_selections();
 }

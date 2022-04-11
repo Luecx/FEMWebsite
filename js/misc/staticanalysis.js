@@ -101,7 +101,7 @@ let ffes_loadcase_name = null;
 
 (async () => {
     const k = await FFES()
-    k.addMessageListener(msg => {
+    k.addMessageListener('analysis', msg => {
         let info = msg[0];
         if (info.startsWith("Attempting to solve matrix:")) {
             sa_progress_bar_1.setAttribute('style', 'width:10%');
@@ -168,7 +168,7 @@ sa_run_button.onclick = function (){
     // set the info text
     sa_progress_info.innerText = "Preprocessing and assembling equations"
 
-    ffes_solver.postMessage({
+    ffes_solver.startAnalysis({
         'node_coords'  : node_coords,
         'element_ids'  : element_ids,
         'element_count': render_scene.model.fe_elements.length,

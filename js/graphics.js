@@ -87,6 +87,7 @@ function start_gl(){
         setup_scene();
         loadcasemenu_init();
         staticanalysis_init();
+        topo_init();
         toolbar_init();
         loadcase_add.click();
     }
