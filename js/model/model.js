@@ -31,19 +31,20 @@ class Model{
         this.scene = scene;
 
         // generate some buffers for rendering
-        this.node_location_buffer  = new NodeDataBuffer();
-        this.node_value_buffer     = new NodeDataBuffer();
-        this.node_selected_buffer  = new NodeDataBuffer();
-        this.node_index_buffer     = new IndexBuffer();
-        this.surround_index_buffer = new IndexBuffer();
+        this.node_location_buffer     = new NodeDataBuffer();
+        this.node_value_buffer        = new NodeDataBuffer();
+        this.node_displacement_buffer = new NodeDataBuffer();
+        this.node_selected_buffer     = new NodeDataBuffer();
+        this.node_index_buffer        = new IndexBuffer();
+        this.surround_index_buffer    = new IndexBuffer();
 
         // to display the values, we need the range of them
-        this.node_min_value        = 0;
-        this.node_max_value        = 1;
+        this.node_min_value           = 0;
+        this.node_max_value           = 1;
 
         // to display boundary conditions (2x for supports, 1 for forces)
-        this.node_restrict_buffer  = new NodeDataBuffer();
-        this.node_force_buffer     = new NodeDataBuffer();
+        this.node_restrict_buffer     = new NodeDataBuffer();
+        this.node_force_buffer        = new NodeDataBuffer();
 
         // append all the fe data like boundary conditions, loadcases and their results
         this.model_data  = new ModelData(this);
@@ -107,7 +108,7 @@ class Model{
         this.surround_index_buffer.setValues(surround);
 
         // set the content of the node value buffer to zeros initially
-        this.node_value_buffer    .setValues(new Float32Array(this.fe_nodes.length));
+        this.setNodeValues(null);
         this.node_selected_buffer .setValues(new Float32Array(this.fe_nodes.length));
         this.node_force_buffer    .setValues(new Float32Array(this.fe_nodes.length * 2));
         this.node_restrict_buffer .setValues(new Float32Array(this.fe_nodes.length * 2));
@@ -116,14 +117,61 @@ class Model{
         this.model_data.notify("meshchanged", [this.fe_nodes.length, this.fe_elements.length]);
     }
 
-    setNodeValues(values){
-        if(values === null){
-            this.node_value_buffer.setValues(new Float32Array(this.fe_nodes.length));
+    // setting the node values from an entry (LoadCaseValues) (see model_data.js)
+    // also detects displacement fields
+    setNodeValues(load_case_values){
+        if(load_case_values === null){
+            this.node_value_buffer       .setValues(new Float32Array(this.fe_nodes.length));
+            this.node_displacement_buffer.setValues(new Float32Array(this.fe_nodes.length * 2));
+            this.node_min_value = 0;
+            this.node_max_value = 1;
         }else{
-            this.node_value_buffer.setValues(values);
-            this.node_min_value = Math.min(...values);
-            this.node_max_value = Math.max(...values);
+            // check if there is a displacement field assigned too
+            let id_data = load_case_values.loadcase_result_id;
+            let dx_data = id_data.getField('Displacement X')
+            let dy_data = id_data.getField('Displacement Y');
+            // no displacement data found
+            if(!(dx_data === null || dy_data === null)){
+                let disp_vector = new Float32Array(this.fe_nodes.length * 2);
+                for(let i = 0; i < this.fe_nodes.length; i++){
+                    disp_vector[i * 2    ] = dx_data.values[i]
+                    disp_vector[i * 2 + 1] = dy_data.values[i];
+                }
+                this.node_displacement_buffer.setValues(disp_vector);
+            }else{
+                this.node_displacement_buffer.setValues(new Float32Array(this.fe_nodes.length * 2));
+            }
+            // set the values to the node buffer
+            this.node_value_buffer.setValues(load_case_values.values);
+            // update min / max
+            this.resetMinMaxNodeValue();
         }
+        this.model_data.notify("displayedvalueschanged", [load_case_values]);
+    }
+
+    resetMinNodeValue(){
+        if(this.node_value_buffer.data !== null)
+            this.node_min_value = Math.min(...this.node_value_buffer.data);
+        else
+            this.node_min_value = 0;
+    }
+
+    resetMaxNodeValue(){
+        if(this.node_value_buffer.data !== null)
+            // if min == max == 0, set max to 1
+            if(Math.min(...this.node_value_buffer.data) ===
+               Math.max(...this.node_value_buffer.data))
+                this.node_max_value = Math.max(...this.node_value_buffer.data) + 1;
+            else{
+                this.node_max_value = Math.max(...this.node_value_buffer.data);
+            }
+        else
+            this.node_max_value = 1;
+    }
+
+    resetMinMaxNodeValue(){
+        this.resetMinNodeValue();
+        this.resetMaxNodeValue();
     }
 
     unselectAllNodes(){

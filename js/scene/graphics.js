@@ -13,7 +13,7 @@ function render() {
     glTextContext.clearRect(0, 0, glTextCanvas.width, glTextCanvas.height)
     glTextContext.restore()
 
-    glContext.clearColor(0.98,0.98,0.98,1.0);
+    glContext.clearColor(0.96,0.96,0.96,1.0);
 
     // glContext.clearColor(1.0,1.0,1.0,1.0);
     // glContext.clearColor(1.0,1.0,1.0,1.0);
@@ -51,6 +51,10 @@ function getGLCanvas(){
 
 function getGLTextContext(){
     return glTextContext;
+}
+
+function getModel(){
+    return render_scene.model;
 }
 
 function start_gl(){
@@ -93,7 +97,11 @@ function start_gl(){
         staticanalysis_init();
         topo_init();
         toolbar_init();
+        visualmenu_init();
         loadcase_add.click();
+        setTimeout(function(){
+            loading_notify();
+        }, 1000);
     }
     renderLoop();
 

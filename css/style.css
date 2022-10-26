@@ -1,20 +1,10 @@
 
-:root {
-    --main-color-gray-bg: #ffffff;
-    --main-color-gray-area: #b2b2b2;
-    --main-color-gray-header: #373430;
-    --main-color-gray-border: #43413D;
-    --main-color-gray-font: #000000;
-}
-
 body {
     font-size: 16px;
     line-height: 1.3rem;
     font-style: normal;
     font-family: 'Noto Sans', Sans-Serif, serif;
     font-weight: 500;
-    color: var(--main-color-gray-font);
-    background-color: var(--main-color-gray-bg);
 }
 
 html, body, header {
@@ -23,12 +13,15 @@ html, body, header {
 
 #graphic-div{
     display:block;
-    height: calc(100% - 115px);
+    height: calc(100% - 4rem - 40px);
     width: 100%;
 }
 
 .menu-button{
-    width: 60px;
-    height: 60px;
-    margin: 5px;
+    width: 3rem;
+    height: 3rem;
+    margin: 0.5rem 0.0rem 0.5rem 0.5rem;
+    text-align: center;
+    line-height: 3rem;
+    font-size: 2em;
 }

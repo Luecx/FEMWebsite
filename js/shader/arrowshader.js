@@ -71,9 +71,9 @@ class ArrowShader extends Shader{
             }`);
 
 
-        let width_base  = 0.2;
-        let width_head  = 0.5;
-        let length_base = 0.7;
+        let width_base  = 0.05;
+        let width_head  = 0.3;
+        let length_base = 0.8;
         let length_head = 0.3;
 
         let n1 = [width_base / 2, 0];

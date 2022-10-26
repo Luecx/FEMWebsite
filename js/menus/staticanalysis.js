@@ -1,3 +1,8 @@
+let sa_valid_mesh_label      = document.getElementById("static-analysis-valid-mesh-label");
+let sa_material_applied_label= document.getElementById("static-analysis-material-applied-label");
+let sa_supports_set_label    = document.getElementById("static-analysis-supports-set-label");
+let sa_forces_applied_label  = document.getElementById("static-analysis-forces-applied-label");
+
 let sa_valid_mesh_icon_icon  = document.getElementById("static-analysis-valid-mesh-icon");
 let sa_material_applied_icon = document.getElementById("static-analysis-material-applied-icon");
 let sa_supports_set_icon     = document.getElementById("static-analysis-supports-set-icon");
@@ -11,15 +16,30 @@ let sa_progress_bar_2        = document.getElementById("static-analysis-progress
 let sa_progress_bar_3        = document.getElementById("static-analysis-progress-3");
 let sa_progress_bar_4        = document.getElementById("static-analysis-progress-4");
 
+let sa_download_button       = document.getElementById("static-analysis-download-button")
+
 toggle_icon_off(sa_valid_mesh_icon_icon);
 toggle_icon_off(sa_material_applied_icon);
 toggle_icon_off(sa_supports_set_icon);
 toggle_icon_off(sa_forces_applied_icon);
 
-enable_toggle("static-analysis-run-button", tb_on_state_2, tb_off_state_3, true, ()=>{});
+enable_toggle("static-analysis-run-button"     , tb_on_state_2, tb_off_state_3, true, ()=>{});
 
 function staticanalysis_init(){
-    render_scene.model.model_data.addEventListener('materialchanged', function (young, poisson){
+
+    // window.addEventListener('resize', () => {
+    //     let max_height = Math.max(
+    //         sa_valid_mesh_label      .offsetHeight,
+    //         sa_material_applied_label.offsetHeight,
+    //         sa_supports_set_label    .offsetHeight,
+    //         sa_forces_applied_label  .offsetHeight)
+    //     sa_valid_mesh_label         .setAttribute("style",`height:${max_height}px`);
+    //     sa_material_applied_label   .setAttribute("style",`height:${max_height}px`);
+    //     sa_supports_set_label       .setAttribute("style",`height:${max_height}px`);
+    //     sa_forces_applied_label     .setAttribute("style",`height:${max_height}px`);
+    // })
+
+    getModel().model_data.addEventListener('materialchanged', function (young, poisson){
         if(young > 0 && poisson >= 0 && poisson <= 0.5){
             toggle_icon_on(sa_material_applied_icon);
         }else{
@@ -27,7 +47,9 @@ function staticanalysis_init(){
         }
         check_run_button_state();
     })
-    render_scene.model.model_data.addEventListener('meshchanged', function (nnodes, nelements){
+    getModel().model_data.addEventListener('meshchanged', function (nnodes, nelements){
+        console.log("mesh changed")
+        toggle_icon_on(sa_valid_mesh_icon_icon);
         if(nnodes > 0 && nelements >= 0){
             toggle_icon_on(sa_valid_mesh_icon_icon);
         }else{
@@ -35,9 +57,9 @@ function staticanalysis_init(){
         }
         check_run_button_state();
     })
-    render_scene.model.model_data.addEventListeners(['activeloadcasechanged', 'loadcasedatachanged'], function (){
+    getModel().model_data.addEventListeners(['activeloadcasechanged', 'loadcasedatachanged'], function (){
         // go through the data and count supports and forces
-        let load_case = render_scene.model.model_data.getActiveLoadCase();
+        let load_case = getModel().model_data.getActiveLoadCase();
         // if there is no loadcase for some reason, toggle it off
         if(load_case === null){
             toggle_icon_off(sa_forces_applied_icon);
@@ -71,7 +93,7 @@ function staticanalysis_init(){
             if(restrict_data.values[i  ] !== 0) supports_x ++;
             if(restrict_data.values[i+1] !== 0) supports_y ++;
         }
-        let is_supported = (supports_x + supports_y) > 3 && (supports_x * supports_x) > 0;
+        let is_supported = (supports_x + supports_y) >= 3 && (supports_x * supports_x) > 0;
 
         if(is_supported){
             toggle_icon_on(sa_supports_set_icon);
@@ -89,10 +111,13 @@ function check_run_button_state(){
         get_icon_state(sa_supports_set_icon)     &&
         get_icon_state(sa_forces_applied_icon)   &&
         ffes_loadcase_name === null);
+    sa_download_button.disabled = sa_run_button.disabled;
     if(sa_run_button.disabled){
         toggle_off(sa_run_button);
+        toggle_off(sa_download_button);
     }else{
-        toggle_on(sa_run_button);
+        toggle_on(sa_run_button)
+        toggle_on(sa_download_button);
     }
 }
 
@@ -119,7 +144,7 @@ let ffes_loadcase_name = null;
             sa_progress_bar_4.setAttribute('style', 'width:5%');
             sa_progress_info.innerText = "Finished computation";
 
-            let loadcase = render_scene.model.model_data.getLoadCase(ffes_loadcase_name);
+            let loadcase = getModel().model_data.getLoadCase(ffes_loadcase_name);
             if(loadcase !== null){
 
                 // make sure an empty id entry exists
@@ -131,7 +156,6 @@ let ffes_loadcase_name = null;
 
                 // get the result data
                 let result_data = msg[1];
-                console.log(result_data);
                 for (const [key, value] of Object.entries(result_data)) {
                     entry.addField(key, value);
                 }
@@ -142,6 +166,10 @@ let ffes_loadcase_name = null;
         }
     });
     ffes_solver = k;
+
+    setTimeout(function(){
+        loading_notify();
+    }, 1000);
 })();
 
 sa_run_button.onclick = function (){
@@ -149,15 +177,15 @@ sa_run_button.onclick = function (){
     let node_coords = [];
     let element_ids = [];
 
-    render_scene.model.fe_nodes   .forEach(n => node_coords.push(n.x, n.y));
-    render_scene.model.fe_elements.forEach(n => element_ids.push(...n.node_ids));
+    getModel().fe_nodes   .forEach(n => node_coords.push(n.x, n.y));
+    getModel().fe_elements.forEach(n => element_ids.push(...n.node_ids));
 
-    let model_data = render_scene.model.model_data;
+    let model_data = getModel().model_data;
     let loadcase   = model_data.getActiveLoadCase();
     sa_run_button.disabled = true;
 
     // save loadcase name so we know where to store the results later
-    ffes_loadcase_name = render_scene.model.model_data.getActiveLoadCaseName();
+    ffes_loadcase_name = getModel().model_data.getActiveLoadCaseName();
 
     // reset the loading bar
     sa_progress_bar_1.setAttribute('style', 'width:0%');
@@ -171,11 +199,15 @@ sa_run_button.onclick = function (){
     ffes_solver.startAnalysis({
         'node_coords'  : node_coords,
         'element_ids'  : element_ids,
-        'element_count': render_scene.model.fe_elements.length,
+        'element_count': getModel().fe_elements.length,
         'material'     : model_data.material,
         'restricted'   : loadcase.getLoadCaseData(LCData.RESTRICT).values,
         'displaced'    : loadcase.getLoadCaseData(LCData.DISPLACE).values,
         'forces'       : loadcase.getLoadCaseData(LCData.FORCE).values});
+}
+
+sa_download_button.onclick = function (){
+    download_mesh();
 }
 
 

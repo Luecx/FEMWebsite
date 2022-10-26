@@ -26,8 +26,10 @@ class Scene{
 
     render(){
         if(this.render_grid)
-            this.grid_shader.render(this.camera);
-        this.mesh_shader .render(this.model, this.camera, this.render_values);
+            this.grid_shader.render(this.model, this.camera);
+        this.mesh_shader    .render(this.model, this.camera, this.render_values,
+            visual_get_underflow_color(),
+            visual_get_overflow_color());
         if(this.render_boundary)
             this.line_shader .render(this.model, this.camera);
         if(this.render_points)

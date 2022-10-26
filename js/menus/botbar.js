@@ -3,28 +3,31 @@ let toolbar_select_source   = document.getElementById("toolbar-select-mode");
 let toolbar_select_id       = document.getElementById("toolbar-select-mode-idx");
 let toolbar_select_values   = document.getElementById("toolbar-select-mode-values");
 
-toolbar_select_source.add(new Option(LCResults.ANALYSIS));
-toolbar_select_source.add(new Option(LCResults.TOPOLOGY_OPTIMIZATION));
+toolbar_select_source.add(new Option(LCResults.ANALYSIS, LCResults.ANALYSIS));
+toolbar_select_source.add(new Option(LCResults.TOPOLOGY_OPTIMIZATION,LCResults.TOPOLOGY_OPTIMIZATION));
+
+select_enable_mousewheel(toolbar_select_loadcase, update_id_selections);
+select_enable_mousewheel(toolbar_select_source  , update_id_selections);
+select_enable_mousewheel(toolbar_select_id      , update_value_selections);
+select_enable_mousewheel(toolbar_select_values  , update_displayed_entries);
 
 function toolbar_init() {
-
-
     // listeners for the loadcase selector
     // ->
     // newloadcase
     // removedloadcase
     // clearedloadcases
-    render_scene.model.model_data.addEventListeners(['newloadcase'], function (name){
+    getModel().model_data.addEventListeners(['newloadcase'], function (name){
         toolbar_select_loadcase.add(new Option(name));
     });
-    render_scene.model.model_data.addEventListeners(['removedloadcase'], function (name){
+    getModel().model_data.addEventListeners(['removedloadcase'], function (name){
         for(let i = 0; i < toolbar_select_loadcase.options.length; i++){
             if(toolbar_select_loadcase.options[i].value === name){
                 toolbar_select_loadcase.options[i].remove();
             }
         }
     });
-    render_scene.model.model_data.addEventListeners(['clearedloadcases'], function (){
+    getModel().model_data.addEventListeners(['clearedloadcases'], function (){
         // the problem is that add is being called before clear since the loadcase manager will invoke
         // the addition of a new loadcase before this event is executed. Solution is to copy the values from
         // the loadcase selector
@@ -44,7 +47,7 @@ function toolbar_init() {
     // addedsourceid         - return  [loadcasesourceid]
     // removedsourceid       - return  [loadcasesourceid]
     // clearedsourceids      - return  [loadcase_result]
-    render_scene.model.model_data.addEventListeners(['addedsourceid'], function (sourceid){
+    getModel().model_data.addEventListeners(['addedsourceid'], function (sourceid){
         // this is only relevant if the selected source and load case match the parents
         if(sourceid.loadcase_result.name          !== toolbar_select_source  .value) return;
         if(sourceid.loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -52,7 +55,7 @@ function toolbar_init() {
         // add the id to selector
         toolbar_select_id.add(new Option(sourceid.id));
     });
-    render_scene.model.model_data.addEventListeners(['removedsourceid'], function (sourceid){
+    getModel().model_data.addEventListeners(['removedsourceid'], function (sourceid){
         // this is only relevant if the selected source and load case match the parents
         if(sourceid.loadcase_result.name          !== toolbar_select_source  .value) return;
         if(sourceid.loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -64,13 +67,14 @@ function toolbar_init() {
             }
         }
 
-        // clear the results
-        while(toolbar_select_values.options.length > 0){
-            toolbar_select_values.options[0].remove();
+        // clear the values if the id to be removed is the current id
+        if(sourceid.loadcase_result.id == toolbar_select_id.value){
+            while(toolbar_select_values.options.length > 0){
+                toolbar_select_values.options[0].remove();
+            }
         }
-
     });
-    render_scene.model.model_data.addEventListeners(['clearedsourceids'], function (loadcase_result){
+    getModel().model_data.addEventListeners(['clearedsourceids'], function (loadcase_result){
         // this is only relevant if the selected source and load case match the parents
         if(loadcase_result.name          !== toolbar_select_source  .value) return;
         if(loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -87,7 +91,7 @@ function toolbar_init() {
     });
 
     // listeners for the value field
-    render_scene.model.model_data.addEventListeners(['addedvalues'], function (data){
+    getModel().model_data.addEventListeners(['addedvalues'], function (data){
         // this is only relevant if the selected source and load case match the parents
         if(data.loadcase_result_id.id                            !=  toolbar_select_id      .value) return;
         if(data.loadcase_result_id.loadcase_result.name          !== toolbar_select_source  .value) return;
@@ -95,8 +99,10 @@ function toolbar_init() {
 
         // add the id to selector
         toolbar_select_values.add(new Option(data.name));
+
+        update_value_selections();
     });
-    render_scene.model.model_data.addEventListeners(['clearedvalues'], function (loadcase_source_id){
+    getModel().model_data.addEventListeners(['clearedvalues'], function (loadcase_source_id){
         // // this is only relevant if the selected source and load case match the parents
         // if(loadcase_result.name          !== toolbar_select_source  .value) return;
         // if(loadcase_result.loadcase.name !== toolbar_select_loadcase.value) return;
@@ -109,7 +115,7 @@ function toolbar_init() {
 }
 
 function update_id_selections(){
-    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    let loadcase = getModel().model_data.getLoadCase(toolbar_select_loadcase.value);
     // clear all
     while(toolbar_select_id.options.length > 0){
         toolbar_select_id[0].remove();
@@ -124,7 +130,7 @@ function update_id_selections(){
 }
 
 function update_value_selections(){
-    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    let loadcase = getModel().model_data.getLoadCase(toolbar_select_loadcase.value);
     // clear all
     while(toolbar_select_values.options.length > 0){
         toolbar_select_values[0].remove();
@@ -142,35 +148,35 @@ function update_value_selections(){
 }
 
 function update_displayed_entries(){
-
-    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+    let loadcase = getModel().model_data.getLoadCase(toolbar_select_loadcase.value);
     if(loadcase === null){
-        render_scene.model.setNodeValues(null);
+        getModel().setNodeValues(null);
         return;
     }
 
     let loadcase_source = loadcase.getLoadCaseResult(toolbar_select_source.value);
     if(loadcase_source === null){
-        render_scene.model.setNodeValues(null);
+        getModel().setNodeValues(null);
         return;
     }
 
     let loadcase_source_id = loadcase_source.getLoadCaseSourceID(parseInt(toolbar_select_id.value));
     if(loadcase_source_id === null){
-        render_scene.model.setNodeValues(null);
+        getModel().setNodeValues(null);
         return;
     }
 
     let result = loadcase_source_id.getField(toolbar_select_values.value);
     if(result === null){
-        render_scene.model.setNodeValues(null);
+        getModel().setNodeValues(null);
     }else{
-        render_scene.model.setNodeValues(result.values);
+        getModel().setNodeValues(result);
     }
 }
 
-function toolbar_select_highest_topo_id(){
-    let loadcase = render_scene.model.model_data.getLoadCase(toolbar_select_loadcase.value);
+function toolbar_select_highest_topo_id(loadcase_name){
+    if(loadcase_name !== toolbar_select_loadcase.value) return;
+    let loadcase = getModel().model_data.getLoadCase(toolbar_select_loadcase.value);
     if(loadcase !== null && toolbar_select_source.value == LCResults.TOPOLOGY_OPTIMIZATION){
         let source = loadcase.getLoadCaseResult(toolbar_select_source.value);
         if(source.ids.length > 0){
@@ -181,8 +187,10 @@ function toolbar_select_highest_topo_id(){
     }
 }
 
-function toolbar_select_topology_optimization(){
-    update
+function toolbar_select_topology_optimization(loadcase_name){
+    if(loadcase_name !== toolbar_select_loadcase.value) return;
+    toolbar_select_source.value = LCResults.TOPOLOGY_OPTIMIZATION;
+    update_id_selections();
 }
 
 toolbar_select_values.onchange = function (ev){
@@ -196,6 +204,7 @@ toolbar_select_id.onchange = function (ev){
 toolbar_select_source.onchange = function (ev){
     update_id_selections();
 }
+
 toolbar_select_loadcase.onchange = function (ev){
     update_id_selections();
 }

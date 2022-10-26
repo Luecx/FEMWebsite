@@ -10,12 +10,13 @@ $(document).ready(function() {
     txcanvas.width  = jqgraphicdiv.width();
     txcanvas.height = jqgraphicdiv.height();
 
-    window.onresize = function () {
+    window.addEventListener('resize',function () {
         glcanvas.width  = jqgraphicdiv.width();
         glcanvas.height = jqgraphicdiv.height();
         txcanvas.width  = jqgraphicdiv.width();
         txcanvas.height = jqgraphicdiv.height();
-    }
+    });
+
     start_gl();
 });
 

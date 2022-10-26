@@ -61,6 +61,14 @@ class ScaleShader extends Shader{
                 vec3 c4 = vec3(1.00, 1.00, 0.00);  // 0.6
                 vec3 c5 = vec3(1.00, 0.00, 0.00);  // 0.85
                 vec3 c6 = vec3(0.51, 0.00, 0.00);  // 1.0
+                // vec3 c1 = vec3(168.0 / 255.0,   0.0 / 255.0, 255.0 / 255.0);  // 0
+                // vec3 c2 = vec3(  0.0 / 255.0, 121.0 / 255.0, 255.0 / 255.0);  // 0.2
+                // vec3 c3 = vec3(  0.0 / 255.0, 241.0 / 255.0,  29.0 / 255.0);  // 0.4
+                // vec3 c4 = vec3(255.0 / 255.0, 239.0 / 255.0,   0.0 / 255.0);  // 0.6
+                // vec3 c5 = vec3(255.0 / 255.0, 127.0 / 255.0,   0.0 / 255.0);  // 0.85
+                // vec3 c6 = vec3(255.0 / 255.0,   9.0 / 255.0,   0.0 / 255.0);  // 1.0
+                
+                v = floor(v * 30.0) / 30.0;
                 
                 if(v < 0.2){
                     return interpolateColors(0.0,0.2,c1,c2,v);
@@ -91,7 +99,7 @@ class ScaleShader extends Shader{
                    float value = (pixel_space.y - y_bar.x) / (y_bar.y - y_bar.x);
                    gl_FragColor  = vec4(getColorbarEntry(1.0 - value),1.0);
                 }else{
-                    gl_FragColor  = vec4(0.0,0.0,0.0,0.7);
+                    gl_FragColor  = vec4(0.0,0.0,0.0,0.5);
                 }
             
             }`);
@@ -113,7 +121,6 @@ class ScaleShader extends Shader{
 
     getAllUniformLocations() {
         super.getAllUniformLocations();
-        this.loc_value_range = super.getUniformLocation("value_range");
         this.loc_screen_size = super.getUniformLocation("screen_size");
         this.loc_x_bar       = super.getUniformLocation("x_bar");
         this.loc_y_bar       = super.getUniformLocation("y_bar");
@@ -166,14 +173,16 @@ class ScaleShader extends Shader{
         if(tex === null) return;
 
         // write some text
-        tex.font = "18px Arial";
+        tex.font = "16px Helvetica";
+        tex.fillStyle  = 'black'
+
 
         let top_v = model.node_max_value;
         let bot_v = model.node_min_value;
         let mid_v = (top_v + bot_v) / 2;
 
         let top_y = 30;
-        let bot_y = camera.getScreenSize()[1] / 2 - 20;
+        let bot_y = camera.getScreenSize()[1] / 2 - 10;
         let mid_y = (top_y + bot_y) / 2;
 
         tex.fillText(top_v.toExponential(1), 55, top_y);
@@ -187,7 +196,7 @@ class ScaleShader extends Shader{
 
     loadBarLocation(camera){
         super.loadVector2(this.loc_x_bar, [20,50]);
-        super.loadVector2(this.loc_y_bar, [20,camera.getScreenSize()[1] / 2 - 20])
+        super.loadVector2(this.loc_y_bar, [20,camera.getScreenSize()[1] / 2 - 10])
     }
 
     loadAreaLocation(camera){

@@ -10,15 +10,25 @@ let loadcase_force_y_value     = document.getElementById("loadcase-force-y-value
 let loadcase_force_selector    = document.getElementById("loadcase-force-select-nodes");
 let loadcase_force_apply       = document.getElementById("loadcase-force-generate");
 
-enable_toggle("loadcase-force-select-nodes", tb_on_state_1, tb_off_state_2, false,function (state){
+enable_toggle("loadcase-force-select-nodes"  , tb_on_state_1, tb_off_state_2, false,function (state){
     render_scene.enable_selection      = state;
     loadcase_force_apply.disabled      = !state;
     loadcase_support_selector.disabled = state;
+    // toggle on button to show all other loads and the nodes
+    toggle_on(toolbar_loads_button, true);
+    toggle_on(toolbar_nodes_button, true);
+    // make sure that no nodes are selected to begin with
+    getModel().unselectAllNodes();
 });
 enable_toggle("loadcase-support-select-nodes", tb_on_state_1, tb_off_state_2, false,function (state){
     render_scene.enable_selection = state;
     loadcase_support_apply.disabled = !state;
     loadcase_force_selector.disabled = state;
+    // toggle on button to show all other supports and the nodes
+    toggle_on(toolbar_supports_button, true);
+    toggle_on(toolbar_nodes_button   , true);
+    // make sure that no nodes are selected to begin with
+    getModel().unselectAllNodes();
 });
 
 function loadcase_bc_reset(){
@@ -26,18 +36,18 @@ function loadcase_bc_reset(){
     toggle_off(loadcase_support_selector);
     // disable selection in the graphics window
     render_scene.enable_selection = false;
-    // reenable both selectors abd disable the apply buttons
-    loadcase_force_selector.disabled = false;
+    // reenable both selectors and disable the apply buttons
+    loadcase_force_selector  .disabled = false;
     loadcase_support_selector.disabled = false;
-    loadcase_force_apply.disabled = true;
-    loadcase_support_apply.disabled = true;
+    loadcase_force_apply     .disabled = true;
+    loadcase_support_apply   .disabled = true;
     // unselect all nodes
-    render_scene.model.unselectAllNodes();
+    getModel().unselectAllNodes();
 }
 
 loadcase_support_apply.onclick = function() {
     // extract the model data for simplicity
-    let model_data     = render_scene.model.model_data;
+    let model_data     = getModel().model_data;
     // get the active loadcase
     let active_lc_name = model_data.getActiveLoadCaseName();
     // get the loadcase
@@ -51,8 +61,8 @@ loadcase_support_apply.onclick = function() {
     let displace_arr   = Object.values(displace_data.values);
 
 
-    for(let i = 0; i < render_scene.model.fe_nodes.length; i++){
-        if(render_scene.model.node_selected_buffer.data[i] > 0){
+    for(let i = 0; i < getModel().fe_nodes.length; i++){
+        if(getModel().node_selected_buffer.data[i] > 0){
             restrict_arr[i * 2 + 0] = loadcase_support_x_enabled.checked ? 1:0;
             restrict_arr[i * 2 + 1] = loadcase_support_y_enabled.checked ? 1:0;
             displace_arr[i * 2 + 0] = parseFloat(loadcase_support_x_value.value);
@@ -66,9 +76,9 @@ loadcase_support_apply.onclick = function() {
     loadcase_bc_reset();
 
 }
-loadcase_force_apply.onclick = function (){
+loadcase_force_apply  .onclick = function (){
     // extract the model data for simplicity
-    let model_data     = render_scene.model.model_data;
+    let model_data     = getModel().model_data;
     // get the active loadcase
     let active_lc_name = model_data.getActiveLoadCaseName();
     // get the loadcase
@@ -79,17 +89,14 @@ loadcase_force_apply.onclick = function (){
     // generate new arrays which will then overwrite the loadcase data
     let force_arr   = Object.values(force_data.values);
 
-    for(let i = 0; i < render_scene.model.fe_nodes.length; i++){
-        if(render_scene.model.node_selected_buffer.data[i] > 0){
+    for(let i = 0; i < getModel().fe_nodes.length; i++){
+        if(getModel().node_selected_buffer.data[i] > 0){
             force_arr[i * 2 + 0] = parseFloat(loadcase_force_x_value.value);
             force_arr[i * 2 + 1] = parseFloat(loadcase_force_y_value.value);
         }
     }
 
-    // feed that data back into the the data fields
+    // feed that data back into the data fields
     load_case.setLoadCaseData(LCData.FORCE, force_arr);
-
-    console.log()
-
     loadcase_bc_reset();
 }

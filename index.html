@@ -2,48 +2,91 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Finns Finite Element Solver</title>
     <base href=".">
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/settings.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">-->
     <link href="assets/fontawesome6/css/all.css" rel="stylesheet">
+    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 
 </head>
+
 <body>
 
-<div style="width:100%; height:100%">
-    <div style="width: 70%; height:100%; float:left">
-        <div style="height:70px">
-            <button id="toolbar-btn-grid" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
-                    title="Enables/Disables the background grid">
+<div class="overflow-hidden" style="width:100%; height:100%">
+    <canvas id="loading-canvas"
+            style="position:fixed;min-height:100%;min-width:100%;height:100%;width:100%;top:0;left:0;z-index: 999">
+    </canvas>
+    <div style="width: 70%; height:100%; float:left" class="bg-light">
+        <div style="height:4rem">
+            <button id="toolbar-btn-grid" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom" title="Enables/Disables the background grid">
+                <i class="fa-solid fa-ruler-combined fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-nodes" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom" title="Enables/Disables the display for the nodes">
+                <i class="fa-solid fa-border-none fa-2x"></i>
+            </button>
+            <button id="toolbar-btn-outline" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom"
+                    title="Enables/Disables the display of the outline of elements">
                 <i class="fa-solid fa-border-all fa-2x"></i>
             </button>
-            <button id="toolbar-btn-nodes" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
-                    title="Enables/Disables the display for the nodes">
-                <i class="fa-solid fa-circle-nodes fa-2x"></i>
-            </button>
-            <button id="toolbar-btn-outline" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
-                    title="Enables/Disables the display of the outline of elements">
-                <i class="fa-solid fa-vector-square fa-2x"></i>
-            </button>
-            <button id="toolbar-btn-loads" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+            <button id="toolbar-btn-loads" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom"
                     title="Enables/Disables the display of applied loads">
-                <i class="fa-solid fa-weight-hanging fa-2x"></i>
+                <i class="fa-solid fa-arrows-down-to-line fa-2x"></i>
             </button>
-            <button id="toolbar-btn-supports" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+            <button id="toolbar-btn-supports" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom"
                     title="Enables/Disables the display of restrained nodes">
-                <i class="fa-solid fa-screwdriver fa-2x"></i>
+                <i class="fa-solid fa-arrows-up-to-line fa-2x"></i>
             </button>
-            <button id="toolbar-btn-show-colors" class="btn btn-secondary menu-button" data-bs-toggle="tooltip"
+            <button id="toolbar-btn-show-colors" class="btn btn-secondary menu-button p-0" data-bs-toggle="tooltip"
+                    data-toggle="tooltip" data-bs-placement="bottom"
                     title="Enables/Disables the display of colors inside the elements">
                 <i class="fa-solid fa-eye-slash fa-2x"></i>
             </button>
+
+
+            <div style="margin-right: 2rem; height:4rem; float:right; text-align: center; vertical-align: middle; line-height: 4rem;font-size: 2rem;">
+                <a class="text-decoration-none fa-brands fa-github fa-1x p-0 text-dark"
+                   href="https://github.com/Luecx/FFES"
+                   target="_blank"></a>
+            </div>
+
+            <div style="height:30px; margin: 24px 10px 0 12px;float:right; text-align: center; vertical-align: bottom; line-height: 30px;font-size: 1rem;">
+                by Finn Eggers
+            </div>
+            <div style="height:4rem; float:right; text-align: center; vertical-align: middle; line-height: 4rem;font-size: 2rem;">
+                <label id="page-title-label">
+                    2D Finite Element Solver
+                </label>
+            </div>
+
+            <button style="height:4rem; float:right;" type="button"
+                    class="btn btn-link text-decoration-none me-4 text-dark border-0 shadow-none" data-bs-toggle="modal"
+                    data-bs-target="#help-modal">
+                <div class="row h-100">
+                    <div class="col align-self-center me-0 pe-0">
+                        Help
+                    </div>
+                    <div class="col align-self-center">
+                        <i class="fa-solid fa-question-circle fa-2x float-start text-black-50"></i>
+                    </div>
+                </div>
+            </button>
+
+
         </div>
         <div style="position: relative; left:0; top:0" id="graphic-div">
             <canvas style="position:absolute; left:0; top:0;" id="graphic-canvas">
@@ -52,7 +95,7 @@
             </canvas>
         </div>
         <div style="height:40px">
-            <div class="input-group m-auto mt-1">
+            <div class="input-group p-auto">
                 <label class="input-group-text" for="toolbar-select-loadcase">LoadCase</label>
                 <select class="form-select" id="toolbar-select-loadcase">
                 </select>
@@ -69,348 +112,929 @@
         </div>
     </div>
 
-    <div class="form-group container vertical-scrollable"
-         style="width: 30%; float:left; padding-left: 1rem; overflow-x:hidden; overflow-y:auto;">
+    <div class="form-group container vertical-scrollable pt-3 pb-4 bg-light"
+         style="width: 30%; height: 100%; float:left; padding-left: 1rem; overflow-x:hidden; overflow-y:auto;">
 
-        <h2>Menu</h2>
-        <div class="accordion accordion-flush" id="menu-flush">
-        <!--            Mesh Menu-->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-mesh-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-mesh" aria-expanded="false" aria-controls="menu-mesh">
-                        Mesh
-                    </button>
-                </h2>
-                <div id="menu-mesh" class="accordion-collapse collapse" aria-labelledby="menu-mesh-heading">
-                    <div class="accordion-body">
-                        <div class="form-group">
-                            <!--                            Preset Selector-->
-                            <div class="input-group mb-4">
-                                <label class="input-group-text" for="mesh-select-preset">Preset</label>
-                                <select class="form-select" id="mesh-select-preset" autocomplete="off">
-                                    <option selected></option>
-                                    <option>Rectangle</option>
-                                    <option>Arc</option>
-                                </select>
-                                <label class="input-group-text" for="mesh-order-select">Order</label>
-                                <select class="form-select" id="mesh-order-select">
-                                    <option selected>1st</option>
-                                    <option selected>2nd</option>
-                                </select>
-                                <button class="btn btn-outline-secondary" id="mesh-generate-button">
-                                    Generate Mesh
-                                </button>
-                            </div>
-                            <!--                            Presets-->
-                            <div id="mesh-rectangle-settings" class="mesh-preset-option d-none">
+        <h2>Menu </h2>
 
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-8 col-lg-6">
-                                        <img style="width: 80%; height: 100%" src="images/rectangle.svg">
+
+        <div>
+            <div class="accordion accordion-flush bg-light" id="menu-flush">
+                <!--            Mesh Menu-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-mesh-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-mesh" aria-expanded="false" aria-controls="menu-mesh">
+                            Mesh
+                        </button>
+                    </h2>
+                    <div id="menu-mesh" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-mesh-heading">
+                        <div class="accordion-body bg-light">
+                            <div class="form-group">
+                                <!--                            Preset Selector-->
+                                <div class="input-group">
+                                    <label class="input-group-text" for="mesh-select-preset">Preset</label>
+                                    <select class="form-select" id="mesh-select-preset" autocomplete="off">
+                                        <option selected></option>
+                                        <option value="hook">Hook</option>
+                                        <option value="rec">Rectangle</option>
+                                        <option value="defect-rectangle">Rectangle with defect</option>
+                                        <option value="arc">Arc</option>
+                                        <option value="i-profile">I-Profile</option>
+                                    </select>
+                                    <label class="input-group-text" for="mesh-order-select">Order</label>
+                                    <select class="form-select" id="mesh-order-select">
+                                        <option selected>1st</option>
+                                        <option selected>2nd</option>
+                                    </select>
+                                    <button class="btn btn-outline-secondary" id="mesh-generate-button">
+                                        Generate Mesh
+                                    </button>
+                                </div>
+                                <!--                            Presets-->
+                                <div id="mesh-rectangle-settings" class="mesh-preset-option d-none">
+
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-md-10 col-xl-8">
+                                            <img style="width: 100%; height: 100%" src="images/rectangle.svg">
+                                        </div>
                                     </div>
+                                    <div class="row g-3">
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-rectangle-width">Width [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-rectangle-width"
+                                                   value="100" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-rectangle-height">Height [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-rectangle-height"
+                                                   value="100" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-rectangle-elements-x">Elements in X</label>
+                                            <input type="number" class="form-control" id="mesh-rectangle-elements-x"
+                                                   value="50" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-rectangle-elements-y">Elements in Y</label>
+                                            <input type="number" class="form-control" id="mesh-rectangle-elements-y"
+                                                   value="50" required>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="mesh-defect-rectangle-settings" class="mesh-preset-option d-none">
+
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-md-10 col-xl-8">
+                                            <img style="width: 100%; height: 100%" src="images/rectangle_defect.svg">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-width">Width \(W\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-width"
+                                                   value="200" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-height">Height \(H\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-height"
+                                                   value="100" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-element-size">Element Size</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-element-size"
+                                                   value="5" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-defect-x">Defect X coordinate \(X_d\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-defect-x"
+                                                   value="50" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-defect-y">Defect Y coordinate \(Y_d\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-defect-y"
+                                                   value="50" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-defect-rectangle-defect-size">Defect Size \(H_d\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-defect-rectangle-defect-size"
+                                                   value="30" required>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="mesh-arc-settings" class="mesh-preset-option d-none">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-md-10 col-xl-8">
+                                            <img style="width: 100%; height: 100%" src="images/arc.svg">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-width">Width \(W\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-arc-width" value="60"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-length">Length \(L\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-arc-length" value="30"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-radius">Outer Radius \(R\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-arc-radius" value="150"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-angle">Arc Angle \(\alpha\) [°]</label>
+                                            <input type="number" class="form-control" id="mesh-arc-angle" value="90"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-elements-arc">Elements along arc</label>
+                                            <input type="number" class="form-control" id="mesh-arc-elements-arc"
+                                                   value="50" required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-arc-elements-width">Elements along
+                                                width</label>
+                                            <input type="number" class="form-control" id="mesh-arc-elements-width"
+                                                   value="10" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 mb-0 alert alert-info alert-dismissible fade show" role="alert">
+                                        <i class="fa-solid fa-xl fa-info-circle"></i>
+                                        Note that setting the arc angle to 360° and the length to 0mm will result in a
+                                        perfect circular <strong> connected </strong> shape which can be considered a
+                                        <strong>circle with a hole</strong>.
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                    </div>
+                                </div>
+                                <div id="mesh-i-profile-settings" class="mesh-preset-option d-none">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-md-10 col-xl-8">
+                                            <img style="width: 100%; height: 100%" src="images/iprofile.svg">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-width">Width \(W\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-width"
+                                                   value="10"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-width-1">Width 1 \(W_1\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-width-1"
+                                                   value="35"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-width-2">Width 2 \(W_2\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-width-2"
+                                                   value="35"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-height">Height \(H\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-height"
+                                                   value="70"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-height-1">Height 1 \(H_1\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-height-1"
+                                                   value="10"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-height-2">Height 2 \(H_2\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-height-2"
+                                                   value="10"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-elements-x">Elements in X</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-elements-x"
+                                                   value="40"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-i-profile-elements-y">Elements in Y</label>
+                                            <input type="number" class="form-control" id="mesh-i-profile-elements-y"
+                                                   value="70"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="mesh-hook-settings" class="mesh-preset-option d-none">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 col-md-10 col-xl-8">
+                                            <img style="width: 100%; height: 100%" src="images/hook.svg">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-width-1">\(W_1\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-width-1" value="20"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-width-2">\(W_2\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-width-2" value="14"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-width-3">\(W_3\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-width-3" value="6"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-width-4">\(W_4\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-width-4" value="3"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-length-1">\(L_1\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-length-1" value="20"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-length-2">\(L_2\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-length-2" value="35"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-length-3">\(L_3\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-length-3" value="5"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-angle-1">Angle 1 \(\alpha\) [°]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-angle-1" value="28"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-angle-2">Angle 2 \(\beta\) [°]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-angle-2" value="180"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-6">
+                                            <label class="mb-1" for="mesh-hook-radius">Inner radius \(R\) [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-radius" value="10"
+                                                   required>
+                                        </div>
+                                        <div class="col-xxl-12">
+                                            <label class="mb-1" for="mesh-hook-element-size">Element size [mm]</label>
+                                            <input type="number" class="form-control" id="mesh-hook-element-size"
+                                                   value="5"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--            Material Menu-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-material-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-material" aria-expanded="false" aria-controls="menu-material">
+                            Material
+                        </button>
+                    </h2>
+                    <div id="menu-material" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-material-heading">
+                        <div class="accordion-body">
+                            <div class="form-group">
+                                <!--                            Preset Selector-->
+                                <div class="input-group mb-4">
+                                    <label class="input-group-text" for="material-select-preset">Preset</label>
+                                    <select class="form-select" id="material-select-preset">
+                                        <option selected></option>
+                                    </select>
+                                    <button class="btn btn-outline-secondary" id="material-apply">
+                                        Apply Material
+                                    </button>
                                 </div>
                                 <div class="row g-3">
+                                    <div class="col-xxl-6">
+                                        <label class="mb-1" for="material-young">Youngs Modulus [Mpa]</label>
+                                        <input type="number" class="form-control" id="material-young"
+                                               value="" required>
+                                    </div>
+                                    <div class="col-xxl-6">
+                                        <label class="mb-1" for="material-poisson">Poisson's Ratio [-]</label>
+                                        <input type="number" class="form-control" id="material-poisson"
+                                               value="" required>
+                                    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-width">Width [mm]</label>
-                                        <input type="number" class="form-control" id="mesh-rectangle-width"
-                                               value="100" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-height">Height [mm]</label>
-                                        <input type="number" class="form-control" id="mesh-rectangle-height"
-                                               value="100" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-elements-x">Elements in X</label>
-                                        <input type="number" class="form-control" id="mesh-rectangle-elements-x"
-                                               value="50" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-elements-y">Elements in Y</label>
-                                        <input type="number" class="form-control" id="mesh-rectangle-elements-y"
-                                               value="50" required>
-                                    </div>
                                 </div>
 
                             </div>
-                            <div id="mesh-arc-settings" class="mesh-preset-option d-none">
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-8 col-lg-6">
-                                        <img style="width: 100%; height: 100%" src="images/arc.svg">
-                                    </div>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-width">Width (W) [mm]</label>
-                                        <input type="number" class="form-control" id="mesh-arc-width" value="60"
-                                               required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-height">Length (L) [mm]</label>
-                                        <input type="number" class="form-control" id="mesh-arc-length" value="30"
-                                               required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-height">Outer Radius (R) [mm]</label>
-                                        <input type="number" class="form-control" id="mesh-arc-radius" value="150"
-                                               required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-height">Arc Angle (alpha) [°]</label>
-                                        <input type="number" class="form-control" id="mesh-arc-angle" value="90"
-                                               required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-elements-x">Elements along outer edge</label>
-                                        <input type="number" class="form-control" id="mesh-arc-elements-arc"
-                                               value="50" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="mb-1" for="mesh-rectangle-elements-y">Elements along width</label>
-                                        <input type="number" class="form-control" id="mesh-arc-elements-width"
-                                               value="10" required>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
-            </div>
-            <!--            Material Menu-->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-material-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-material" aria-expanded="false" aria-controls="menu-material">
-                        Material
-                    </button>
-                </h2>
-                <div id="menu-material" class="accordion-collapse collapse" aria-labelledby="menu-material-heading">
-                    <div class="accordion-body">
-                        <div class="form-group">
-                            <!--                            Preset Selector-->
-                            <div class="input-group mb-4">
-                                <label class="input-group-text" for="material-select-preset">Preset</label>
-                                <select class="form-select" id="material-select-preset">
-                                    <option selected></option>
-                                </select>
-                                <button class="btn btn-outline-secondary" id="material-apply">
-                                    Apply Material
-                                </button>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="mb-1" for="material-young">Youngs Module [Mpa]</label>
-                                    <input type="number" class="form-control" id="material-young"
-                                           value="" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="mb-1" for="material-poisson">Poisson's Ratio [-]</label>
-                                    <input type="number" class="form-control" id="material-poisson"
-                                           value="" required>
+                <!--            Load Case Menu-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-loadcase-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-loadcase" aria-expanded="false" aria-controls="menu-loadcase">
+                            LoadCase
+                        </button>
+                    </h2>
+                    <div id="menu-loadcase" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-loadcase-heading">
+                        <div class="accordion-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select class="form-select" id="select-loadcase"></select>
+                                    <button class="btn btn-outline-secondary" id="btn-add-loadcase">
+                                        <i class="fa-solid fa-plus fa"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="btn-remove-loadcase">
+                                        <i class="fa-solid fa-minus fa"></i>
+                                    </button>
                                 </div>
 
-                            </div>
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!--            Load Case Menu-->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-loadcase-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-loadcase" aria-expanded="false" aria-controls="menu-loadcase">
-                        LoadCase
-                    </button>
-                </h2>
-                <div id="menu-loadcase" class="accordion-collapse collapse" aria-labelledby="menu-loadcase-heading">
-                    <div class="accordion-body">
-                        <div class="form-group">
-                            <div class="input-group mb-4">
-                                <select class="form-select" id="select-loadcase"></select>
-                                <button class="btn btn-outline-secondary" id="btn-add-loadcase">
-                                    <i class="fa-solid fa-plus fa"></i>
+                <!--            boundary conditions-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-boundary-conditions-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-boundary-conditions" aria-expanded="false"
+                                aria-controls="menu-boundary-conditions">
+                            Boundary Conditions
+                        </button>
+                    </h2>
+                    <div id="menu-boundary-conditions" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-boundary-conditions-heading">
+                        <div class="accordion-body">
+                            <label class="mb-1" for="loadcase-support-group">Apply Displacement</label>
+                            <div class="input-group mb-4" id="loadcase-support-group">
+                                <label class="input-group-text user-select-none"
+                                       for="loadcase-support-x-enabled">X</label>
+                                <div class="input-group-text user-select-none" id="loadcase-support-x-group">
+                                    <input class="form-check-input mt-0" type="checkbox" checked autocomplete="off"
+                                           id="loadcase-support-x-enabled">
+                                </div>
+                                <input type="number" class="form-control" value="0" id="loadcase-support-x-value">
+                                <label class="input-group-text user-select-none"
+                                       for="loadcase-support-y-enabled">Y</label>
+                                <div class="input-group-text user-select-none" id="loadcase-support-y-group">
+                                    <input class="form-check-input mt-0" type="checkbox" checked autocomplete="off"
+                                           id="loadcase-support-y-enabled">
+                                </div>
+                                <input type="number" class="form-control" value="0" id="loadcase-support-y-value">
+                                <button class="btn btn-outline-secondary" id="loadcase-support-select-nodes">
+                                    <i class="fa-solid fa-arrow-pointer"></i>
                                 </button>
-                                <button class="btn btn-outline-secondary" id="btn-remove-loadcase">
-                                    <i class="fa-solid fa-minus fa"></i>
+                                <button class="btn btn-outline-secondary" id="loadcase-support-generate" disabled>
+                                    Apply
                                 </button>
                             </div>
 
+                            <label class="mb-1" for="loadcase-force-group">Generate Force</label>
+                            <div class="input-group" id="loadcase-force-group">
+                                <label class="input-group-text user-select-none" for="loadcase-force-x-value">X</label>
+                                <input type="number" class="form-control" value="0" id="loadcase-force-x-value">
+                                <label class="input-group-text user-select-none" for="loadcase-force-y-value">Y</label>
+                                <input type="number" class="form-control" value="0" id="loadcase-force-y-value">
+                                <button class="btn btn-outline-secondary" id="loadcase-force-select-nodes">
+                                    <i class="fa-solid fa-arrow-pointer"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" id="loadcase-force-generate" disabled>
+                                    Apply
+                                </button>
+                            </div>
 
-
+                            <div class="mt-4 mb-0 alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="fa-solid fa-xl fa-info-circle"></i>
+                                You can start selecting nodes
+                                once you enable the selection mode <i class="fa-solid fa-arrow-pointer"></i>.
+                                Make sure to hit the <strong>Apply</strong> button once you are done selecting nodes.
+                                If you want to <strong>deselect nodes</strong>, you can hold the <strong>Strg</strong>-key
+                                on windows systems or the <strong>command</strong>-key if you are on a mac system.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--            static analysis-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-static-analysis-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-static-analysis" aria-expanded="false"
+                                aria-controls="menu-static-analysis">
+                            Static Analysis
+                        </button>
+                    </h2>
+                    <div id="menu-static-analysis" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-static-analysis-heading">
+                        <div class="accordion-body">
+                            <div class="row g-3 text-center">
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label id="static-analysis-valid-mesh-label" class="w-100 mb-1"><b>Valid
+                                        Mesh</b></label>
+                                    <i id="static-analysis-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label id="static-analysis-material-applied-label" class="w-100 mb-1"><b>Material
+                                        applied</b></label>
+                                    <i id="static-analysis-material-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label id="static-analysis-supports-set-label" class="w-100 mb-1"><b>Supports
+                                        set</b></label>
+                                    <i id="static-analysis-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label id="static-analysis-forces-applied-label" class="w-100 mb-1"><b>Forces
+                                        applied</b></label>
+                                    <i id="static-analysis-forces-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="progress mt-4">
+                                    <div id="static-analysis-progress-1"
+                                         class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                         role="progressbar" style="width: 0"></div>
+                                    <div id="static-analysis-progress-2"
+                                         class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                                         role="progressbar" style="width: 0"></div>
+                                    <div id="static-analysis-progress-3"
+                                         class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                                         role="progressbar" style="width: 0"></div>
+                                    <div id="static-analysis-progress-4"
+                                         class="progress-bar progress-bar-striped progress-bar-animated"
+                                         role="progressbar" style="width: 0"></div>
+                                </div>
+                                <button class="btn btn-primary mt-3" id="static-analysis-run-button">Start</button>
+                                <button class="btn btn-link mt-3 text-decoration-none"
+                                        id="static-analysis-download-button"><u>or download mesh</u> <i
+                                        class="fa fa-download"></i></button>
+                                <label class="float-end me-1 mt-1" id="static-analysis-progress-info"></label>
+                            </div>
 
 
                         </div>
                     </div>
                 </div>
-            </div>
+                <!--            topology optimization-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-topology-optimization-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-topology-optimization" aria-expanded="false"
+                                aria-controls="menu-topology-optimization">
+                            Topology optimization
+                        </button>
+                    </h2>
+                    <div id="menu-topology-optimization" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-topology-optimization-heading">
+                        <div class="accordion-body">
 
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-boundary-conditions-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-boundary-conditions" aria-expanded="false" aria-controls="menu-boundary-conditions">
-                        Boundary Conditions
-                    </button>
-                </h2>
-                <div id="menu-boundary-conditions" class="accordion-collapse collapse" aria-labelledby="menu-boundary-conditions-heading">
-                    <div class="accordion-body">
-                        <label class="mb-1" for="loadcase-support-group">Apply Displacement</label>
-                        <div class="input-group mb-4" id="loadcase-support-group">
-                            <label class="input-group-text" for="loadcase-support-x-group">X</label>
-                            <div class="input-group-text" id="loadcase-support-x-group">
-                                <input class="form-check-input mt-0" type="checkbox" value="" id="loadcase-support-x-enabled">
-                            </div>
-                            <input type="number" class="form-control" value="0" id="loadcase-support-x-value">
-                            <label class="input-group-text" for="loadcase-support-y-group">Y</label>
-                            <div class="input-group-text" id="loadcase-support-y-group">
-                                <input class="form-check-input mt-0" type="checkbox" value="" id="loadcase-support-y-enabled">
-                            </div>
-                            <input type="number" class="form-control" value="0" id="loadcase-support-y-value">
-                            <button class="btn btn-outline-secondary" id="loadcase-support-select-nodes">
-                                <i class="fa-solid fa-arrow-pointer"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" id="loadcase-support-generate" disabled>
-                                Apply
-                            </button>
-                        </div>
+                            <div class="row g-3 mb-5">
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-filter-radius">Filter Radius
+                                        [mm]</label>
+                                    <input type="number" class="form-control" id="topology-optimization-filter-radius"
+                                           value="10" required>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-max-iterations">Max
+                                        Iterations</label>
+                                    <input type="number" class="form-control" id="topology-optimization-max-iterations"
+                                           value="100" required>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-target-density">Target
+                                        Density</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control"
+                                               id="topology-optimization-target-density"
+                                               value="50" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-min-density">Min Density</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="topology-optimization-min-density"
+                                               value="1" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-penalty-factor">Penalty
+                                        Factor</label>
+                                    <input type="number" class="form-control" id="topology-optimization-penalty-factor"
+                                           value="3" required>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="mb-1" for="topology-optimization-move-limit">Move Limit</label>
+                                    <input type="number" class="form-control" id="topology-optimization-move-limit"
+                                           value="0.2" required>
+                                </div>
 
-                        <label class="mb-1" for="loadcase-force-group">Generate Force</label>
-                        <div class="input-group mb-4" id="loadcase-force-group">
-                            <label class="input-group-text" for="loadcase-force-x-value">X</label>
-                            <input type="number" class="form-control" value="0" id="loadcase-force-x-value">
-                            <label class="input-group-text" for="loadcase-force-y-value">Y</label>
-                            <input type="number" class="form-control" value="0" id="loadcase-force-y-value">
-                            <button class="btn btn-outline-secondary" id="loadcase-force-select-nodes">
-                                <i class="fa-solid fa-arrow-pointer"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" id="loadcase-force-generate" disabled>
-                                Apply
-                            </button>
+                            </div>
+
+                            <div class="row g-3 text-center">
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label class="w-100 mb-1" id="topology-optimization-valid-mesh-label"><b>Valid
+                                        Mesh</b></label>
+                                    <i id="topology-optimization-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label class="w-100 mb-1" id="topology-optimization-material-applied-label"><b>Material
+                                        applied</b></label>
+                                    <i id="topology-optimization-material-applied-icon"
+                                       class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label class="w-100 mb-1" id="topology-optimization-supports-set-label"><b>Supports
+                                        set</b></label>
+                                    <i id="topology-optimization-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <label class="w-100 mb-1" id="topology-optimization-forces-applied-label"><b>Forces
+                                        applied</b></label>
+                                    <i id="topology-optimization-forces-applied-icon"
+                                       class="fa-solid fa-check fa-2x"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="progress mt-4">
+                                    <div id="topology-optimization-progress-bar"
+                                         class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                         role="progressbar" style="width: 0"></div>
+                                </div>
+                                <button class="btn btn-primary mt-3" id="topology-optimization-run-button">Start
+                                </button>
+                                <label class="float-end me-1 mt-1" id="topology-optimization-progress-info"></label>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
-            </div>
+                <!--            visual stuff-->
+                <div class="accordion-item bg-light">
+                    <h2 class="accordion-header bg-light" id="menu-visual-heading">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#menu-visual" aria-expanded="false" aria-controls="menu-visual">
+                            Visual Settings &nbsp; <span class="badge bg-danger">New</span>
+                        </button>
+                    </h2>
+                    <div id="menu-visual" class="accordion-collapse collapse bg-light"
+                         aria-labelledby="menu-topology-optimization-heading">
+                        <div class="accordion-body">
 
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-static-analysis-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-static-analysis" aria-expanded="false" aria-controls="menu-static-analysis">
-                        Static Analysis
-                    </button>
-                </h2>
-                <div id="menu-static-analysis" class="accordion-collapse collapse" aria-labelledby="menu-static-analysis-heading">
-                    <div class="accordion-body">
-                        <div class="row g-3 text-center">
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Valid Mesh</b></label>
-                                <i id="static-analysis-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
+                            <label class="mb-1" for="menu-visual-colorbar-range">Colorbar range min/max</label>
+                            <div class="row mb-3" id="menu-visual-colorbar-range">
+                                <div class="col-xxl-6">
+                                    <div class="input-group">
+                                        <label class="input-group-text user-select-none"
+                                               for="menu-visual-colorbar-range-min-input">min</label>
+                                        <input type="number" class="form-control w-25"
+                                               id="menu-visual-colorbar-range-min-input">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                                id="menu-visual-colorbar-range-min-auto-button">Reset
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-xxl-6">
+                                    <div class="input-group">
+                                        <label class="input-group-text user-select-none"
+                                               for="menu-visual-colorbar-range-max-input">max</label>
+                                        <input type="number" class="form-control w-25"
+                                               id="menu-visual-colorbar-range-max-input">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                                id="menu-visual-colorbar-range-max-auto-button">Reset
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Material applied</b></label>
-                                <i id="static-analysis-material-applied-icon" class="fa-solid fa-check fa-2x"></i>
+
+                            <label class="mb-1" for="menu-colorbar-oob-color">Colorbar out of bounds colors</label>
+                            <div class="row mb-5" id="menu-colorbar-oob-color">
+                                <div class="col-sm-6">
+                                    <div class="input-group">
+                                        <label class="input-group-text user-select-none"
+                                               for="menu-visual-colorbar-underflow-show">min</label>
+
+                                        <div class="input-group-text user-select-none">
+                                            <input class="form-check-input mt-0 user-select-none" type="checkbox"
+                                                   checked autocomplete="off" id="menu-visual-colorbar-underflow-show">
+                                        </div>
+
+                                        <input type="color" class="form-control form-control-color mw-100"
+                                               id="menu-visual-colorbar-underflow-color" value=#aaaaaa
+                                               title="Choose your color">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="input-group">
+                                        <label class="input-group-text user-select-none"
+                                               for="menu-visual-colorbar-overflow-show">max</label>
+
+                                        <div class="input-group-text user-select-none">
+                                            <input class="form-check-input mt-0 user-select-none" type="checkbox"
+                                                   checked autocomplete="off"
+                                                   id="menu-visual-colorbar-overflow-show">
+                                        </div>
+
+                                        <input type="color" class="form-control form-control-color mw-100"
+                                               id="menu-visual-colorbar-overflow-color" value=#691b1d
+                                               title="Choose your color">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Supports set</b></label>
-                                <i id="static-analysis-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
+
+
+                            <div class="mb-1" for="menu-visual-displacement-scaling-range">
+                                <label class="float-start">Scaling of displacements</label>
+                                <label class="float-end" id="menu-visual-displacement-scaling-label">1</label>
                             </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Forces applied</b></label>
-                                <i id="static-analysis-forces-applied-icon" class="fa-solid fa-check fa-2x"></i>
+                            <input type="range" class="form-range" id="menu-visual-displacement-scaling-range" min="0"
+                                   max="55" step="1" autocomplete="off" value="0">
+                            <div class="container-fluid p-0">
+                                <span class="text-start float-start" style="width:11%">0</span>
+                                <span class="text-end float-end" style="width:9%">1e5</span>
+                                <div class="row row-cols">
+                                    <span class="col text-center">1</span>
+                                    <span class="col text-center">10</span>
+                                    <span class="col text-center">100</span>
+                                    <span class="col text-center">1e3</span>
+                                    <span class="col text-center">1e4</span>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <div class="progress mt-4">
-                                <div id="static-analysis-progress-1"
-                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                                     role="progressbar" style="width: 0"></div>
-                                <div id="static-analysis-progress-2"
-                                     class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
-                                     role="progressbar" style="width: 0"></div>
-                                <div id="static-analysis-progress-3"
-                                     class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
-                                     role="progressbar" style="width: 0"></div>
-                                <div id="static-analysis-progress-4"
-                                     class="progress-bar progress-bar-striped progress-bar-animated"
-                                     role="progressbar" style="width: 0"></div>
-                            </div>
-                            <button class="btn btn-primary mt-3" id="static-analysis-run-button">Start</button>
-                            <label class="float-end me-1 mt-1" id="static-analysis-progress-info"></label>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="menu-topology-optimization-heading">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#menu-topology-optimization" aria-expanded="false" aria-controls="menu-topology-optimization">
-                        Topology optimization
-                    </button>
-                </h2>
-                <div id="menu-topology-optimization" class="accordion-collapse collapse" aria-labelledby="menu-topology-optimization-heading">
-                    <div class="accordion-body">
-                        <div class="row g-3 text-center">
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Valid Mesh</b></label>
-                                <i id="topology-optimization-valid-mesh-icon" class="fa-solid fa-check fa-2x"></i>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Material applied</b></label>
-                                <i id="topology-optimization-material-applied-icon" class="fa-solid fa-check fa-2x"></i>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Supports set</b></label>
-                                <i id="topology-optimization-supports-set-icon" class="fa-solid fa-check fa-2x"></i>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100 mb-1"><b>Forces applied</b></label>
-                                <i id="topology-optimization-forces-applied-icon" class="fa-solid fa-check fa-2x"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="progress mt-4">
-                                <div id="topology-optimization-progress-bar"
-                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                                     role="progressbar" style="width: 0"></div>
-                            </div>
-                            <button class="btn btn-primary mt-3" id="topology-optimization-run-button">Start</button>
-                            <label class="float-end me-1 mt-1" id="topology-optimization-progress-info"></label>
-                        </div>
-
-
                     </div>
                 </div>
             </div>
         </div>
 
+
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="help-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content" style="height: 700px;">
+                <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="false" data-interval="false">
+                    <div class="carousel-indicators">
+                        <button type="button" style="filter:invert(100%)" data-bs-target="#carouselExampleCaptions"
+                                data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" style="filter:invert(100%)" data-bs-target="#carouselExampleCaptions"
+                                data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" style="filter:invert(100%)" data-bs-target="#carouselExampleCaptions"
+                                data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" style="filter:invert(100%)" data-bs-target="#carouselExampleCaptions"
+                                data-bs-slide-to="3" aria-label="Slide 4"></button>
+                    </div>
+                    <div class="carousel-inner px-5 h-100">
+                        <div class="carousel-item py-5 active h-100 container">
+                            <div class="mb-4 text-dark text-center">
+                                <h4><strong>1: Creating a mesh</strong></h4>
+                                <p>A Mesh is the fundamental building block of a simulation. It divides the model to
+                                    analyse into smaller elements, the <strong>finite elements</strong>. The finite
+                                    elements are defined
+                                    by their vertices which are called <strong>nodes</strong></p>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-12 col-xl-4">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/mesh-1.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 1</strong> Select a preset</h5>
+                                            <p class="card-text">You can choose a model preset from a range of
+                                                predefined models. You can adjust the shape of these presets using the
+                                                parameters below</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-4">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/mesh-2.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 2</strong> Choose the order</h5>
+                                            <p class="card-text text-dark">One can choose the order of elements used.
+                                                The choice can be made between first and second order.
+                                                Second order usually yields more accurate results at the cost of
+                                                slightly longer computation times.</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-4">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/mesh-3.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 3</strong> Generate the mesh</h5>
+                                            <p class="card-text">Click the <strong>Generate Mesh</strong> button in
+                                                order to generate the mesh with the selected order and choosen
+                                                parameters from the previous two steps. You can see the mesh in the main
+                                                screen.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="carousel-item py-5 h-100 container">
+                            <div class="mb-4 text-dark text-center">
+                                <h4><strong>2: Assigning material</strong></h4>
+                                <p>The mesh describes the physical shape of the object. To evaluate its deformation
+                                    under a set of forces and constraints, it is required to specify
+                                    the material which is being used. There are two options to do this, one <strong>advanced</strong>
+                                    way with custom material properties and one <strong>simple</strong> way where you
+                                    can choose
+                                    a material from a list of predefined materials.</p>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/material-1.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Simple</strong></h5>
+                                            <p class="card-text">One can choose one out of the predefined materials. It
+                                                will look up the material data inside a database. After selecting the
+                                                material of choice, make sure to hit <strong>Apply
+                                                    Material</strong> button. You can verify that the material has been
+                                                applied by looking at the <strong>Analysis</strong>-Menu which should
+                                                show a green checkmark </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/material-2.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Advanced</strong></h5>
+                                            <p class="card-text text-dark">If you have information about your material,
+                                                especially the youngs modulus and the poisson ratio, you can instead
+                                                simply put
+                                                those numbers into the given fields and hit the <strong>Apply
+                                                    Material</strong> button. You can verify that the material has been
+                                                applied by looking at the <strong>Analysis</strong>-Menu which should
+                                                show a green checkmark</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="carousel-item py-5 h-100 container">
+                            <div class="mb-4 text-dark text-center">
+                                <h4><strong>3: Creating supports</strong></h4>
+                                <p>After describing the model, all we need is a set of constraints. These constraints
+                                    will make sure that our model can not move into certain directions.
+                                    The simplest constraint is a fixed support which simply constraints one or more
+                                    nodes into the x, y or both directions.</p>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/support-1.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 1</strong></h5>
+                                            <p class="card-text">To set a constraint, one needs to open the
+                                                <stong>Boundary Conditions</stong>
+                                                Menu. The first part is describing what type of constraint one wants.
+                                                The top checkboxes like in the image above describe which coordinate
+                                                will be constrained. The value in the input is only for advanced users
+                                                and should be kept at 0.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/support-2.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 2</strong></h5>
+                                            <p class="card-text">To actually start selecting nodes, one needs to click
+                                                on the small mouse-button <i class="fa-solid fa-arrow-pointer"></i>. This
+                                                    will allow you to start selecting nodes by clicking on them with the
+                                                    left mouse-button. After the selection is done, make sure to hit the
+                                                    <strong>Apply</strong> button
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="carousel-item py-5 h-100 container">
+                            <div class="mb-4 text-dark text-center">
+                                <h4><strong>4: Applying forces</strong></h4>
+                                <p>Now that the model is defined and properly constrained, the last part would be to
+                                    actually apply forces. These forces can be applied similar to the constraints.</p>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/force-1.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 1</strong></h5>
+                                            <p class="card-text">To set a force, one needs to open the
+                                                <stong>Boundary Conditions</stong>
+                                                Menu. The first part is describing the magnitude of the force to be
+                                                applied in both, the x and y direction.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-6">
+                                    <div class="card border-0">
+                                        <img class="card-img-top" src="images/help/force-2.png" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Step 2</strong></h5>
+                                            <p class="card-text">To actually start selecting nodes, one needs to click
+                                                on the small mouse-button <i class="fa-solid fa-arrow-pointer"></i>. This
+                                                will allow you to start selecting nodes by clicking on them with the
+                                                left mouse-button. After the selection is done, make sure to hit the
+                                                <strong>Apply</strong> button and you should see some force-vectors at the previously selected models.
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" style="filter:invert(100%)" type="button"
+                            data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" style="left:1rem;position: absolute;" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" style="filter:invert(100%)" type="button"
+                            data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" style="right:1rem;position: absolute;" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <!--                <div class="modal-header">-->
+                <!--                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>-->
+                <!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+                <!--                </div>-->
+                <!--                <div class="modal-body">-->
+                <!--                    ...-->
+                <!--                </div>-->
+                <!--                <div class="modal-footer">-->
+                <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+                <!--                    <button type="button" class="btn btn-primary">Save changes</button>-->
+                <!--                </div>-->
+            </div>
+        </div>
     </div>
 
 </div>
 
 <script src="solver/FFES_0.1.js"></script>
 
+<script src="js/misc/loading.js"></script>
 <script src="js/misc/ready.js"></script>
 
 <script src="js/misc/togglebutton.js"></script>
 <script src="js/misc/toggleicon.js"></script>
+<script src="js/misc/select.js"></script>
 
 <script src="js/model/model_data.js"></script>
 <script src="js/model/model.js"></script>
 
-<script src="js/misc/loadcasemenu.js"></script>
-<script src="js/misc/loadcasebcsettings.js"></script>
-<script src="js/misc/meshmenu.js"></script>
-<script src="js/misc/materialmenu.js"></script>
-<script src="js/misc/staticanalysis.js"></script>
-<script src="js/misc/topologyopt.js"></script>
+<script src="js/menus/loadcasemenu.js"></script>
+<script src="js/menus/loadcasebcsettings.js"></script>
+<script src="js/menus/meshmenu.js"></script>
+<script src="js/menus/materialmenu.js"></script>
+<script src="js/menus/staticanalysis.js"></script>
+<script src="js/menus/topologyopt.js"></script>
+<script src="js/menus/visualmenu.js"></script>
 
-<script src="js/misc/toolbar.js"></script>
-<script src="js/misc/botbar.js"></script>
+<script src="js/menus/toolbar.js"></script>
+<script src="js/menus/botbar.js"></script>
+<script src="js/misc/download.js"></script>
+<script src="js/misc/tooltip.js"></script>
 
 <script src="js/input/Camera.js"></script>
 <script src="js/shader/shader.js"></script>
@@ -420,12 +1044,14 @@
 <script src="js/shader/pointshader.js"></script>
 <script src="js/shader/lineshader.js"></script>
 <script src="js/shader/arrowshader.js"></script>
-<script src="js/input/Control.js"></script>
+<script src="js/input/control.js"></script>
 <script src="js/model/generate_mesh.js"></script>
 <script src="js/model/buffer.js"></script>
 <script src="js/model/element.js"></script>
 <script src="js/scene/Scene.js"></script>
 <script src="js/debug/webgl-debug.js"></script>
-<script src="js/graphics.js"></script>
+<script src="js/scene/graphics.js"></script>
+
+
 </body>
 </html>

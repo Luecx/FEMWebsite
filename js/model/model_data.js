@@ -142,28 +142,29 @@ class LoadCase{
 /**
  * events:
  *
- * activeloadcasechanged - returns [loadcase-name]
- * newloadcase           - returns [loadcase-name]
- * removedloadcase       - returns [loadcase-name]
- * clearedloadcases      - return  [-]
+ * activeloadcasechanged  - returns [loadcase-name]
+ * newloadcase            - returns [loadcase-name]
+ * removedloadcase        - returns [loadcase-name]
+ * clearedloadcases       - return  [-]
  *
- * loadcasedatachanged   - return  [loadcase, data]
+ * loadcasedatachanged    - return  [loadcase, data]
  *
- * addedsourceid         - return  [loadcasesourceid]
- * removedsourceid       - return  [loadcasesourceid]
- * clearedsourceids      - return  [loadcaseresult]
+ * addedsourceid          - return  [loadcasesourceid]
+ * removedsourceid        - return  [loadcasesourceid]
+ * clearedsourceids       - return  [loadcaseresult]
  *
- * addedvalues           - return  [loadcasevalues]
- * clearedvalues         - return  [loadcasesourceid]
+ * addedvalues            - return  [loadcasevalues]
+ * clearedvalues          - return  [loadcasesourceid]
  *
- * materialchanged       - returns [young, poisson]
- * meshchanged           - returns [n_nodes, n_elements] // note that this is an event of the model
- *                                                       // but to keep all events at the same place, it will be invoked
- *                                                       // and stored within the model_data.
+ * materialchanged        - returns [young, poisson]
  *
+ * meshchanged            - returns [n_nodes, n_elements] // note that this is an event of the model
+ *                                                        // but to keep all events at the same place, it will be invoked
+ *                                                        // and stored within the model_data.
+ * displayedvalueschanged - return  [loadcasevalues]      // note that this is an event of the model
+ *                                                        // it returns the loadcase values entry (can be null)
+ *                                                        // can be traced to retrieve displacement fields
  *
- * addedid           - returns [loadcase-name, source]
- * addedvalues       - returns [loadcase-name, source, id, name]
  */
 class ModelData{
     constructor(model) {

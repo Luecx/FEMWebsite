@@ -92,6 +92,11 @@ class Shader {
         if(gl === null) return;
         gl.uniform3f(location, array[0], array[1], array[2]);
     }
+    loadVector4(location, array){
+        let gl = getGLContext();
+        if(gl === null) return;
+        gl.uniform4f(location, array[0], array[1], array[2], array[3]);
+    }
     loadBool(location, value){
         let gl = getGLContext();
         if(gl === null) return;
